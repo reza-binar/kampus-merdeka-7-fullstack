@@ -14,21 +14,17 @@ searchForm.addEventListener("submit", (e) => {
 
 // Normal function
 async function searchStudentContent(search) {
-    const studentsData = await getStudentData();
-
     studentContent.innerHTML = "<h1>Loading...</h1>";
 
-    // search student by input (Backend)
-    const filteredStudent = studentsData.filter((student) => {
-        return (
-            student.name.toLowerCase().includes(search) ||
-            student.education.bachelor.toLowerCase().includes(search)
-        );
-    });
+    const data = await getStudentData(search);
+    if (data.length === 0) {
+        studentContent.innerHTML = `<h1>Searching ${search} not found!</h1>`;
+        return;
+    }
 
     // Frontend
     let studentContentHTML = "";
-    filteredStudent.map((student) => {
+    data.map((student) => {
         // variable that will be show in student-content id
         const studentContent = `
             <div class="col-md-3">
@@ -51,11 +47,19 @@ async function searchStudentContent(search) {
 }
 
 // Arrow function, this function is to get students.json data that can be rendered to html file
-const getStudentData = async () => {
+const getStudentData = async (search) => {
     const response = await fetch("./data/students.json");
     const data = await response.json();
 
-    return data;
+    // search student by input (Backend)
+    const filteredData = data.filter((student) => {
+        return (
+            student.name.toLowerCase().includes(search) ||
+            student.education.bachelor.toLowerCase().includes(search)
+        );
+    });
+
+    return filteredData;
 };
 
 /* Show all student data */
