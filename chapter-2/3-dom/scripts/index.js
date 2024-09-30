@@ -1,6 +1,7 @@
 const studentContent = document.getElementById("student-content");
 const search = document.getElementById("search");
 const searchForm = document.getElementById("search-form");
+const startDate = document.getElementById("startDate");
 
 search.addEventListener("input", (e) => {
     // If the search is change, the function will be running
@@ -10,6 +11,21 @@ search.addEventListener("input", (e) => {
 
 searchForm.addEventListener("submit", (e) => {
     e.preventDefault();
+});
+
+startDate.addEventListener("change", (e) => {
+    const date = new Date("2024-10-18").getTime();
+    const yourDate = new Date(e.target.value).getTime();
+    console.log(date);
+    console.log(yourDate);
+
+    if (yourDate > date) {
+        console.log("Hmm");
+    } else if (yourDate === date) {
+        console.log("yess");
+    } else {
+        console.log("zzz");
+    }
 });
 
 // Normal function
