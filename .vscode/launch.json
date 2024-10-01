@@ -9,8 +9,9 @@
             "request": "launch",
             "name": "Chapter 3 - Express.js",
             "skipFiles": ["<node_internals>/**"],
-            "program": "${workspaceFolder}/chapter-3/express-js/index.js",
-            "cwd": "${workspaceFolder}/chapter-3/express-js"
+            "cwd": "${workspaceFolder}/chapter-3/express-js",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"] // Corrected this line
         }
     ]
 }
