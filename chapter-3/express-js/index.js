@@ -91,7 +91,7 @@ app.post("/students", (req, res) => {
 
     /* Add data to current array students */
     const newStudent = {
-        id: students + 1,
+        id: students.length + 1,
         name,
         nickName,
         class: req.body.class,
