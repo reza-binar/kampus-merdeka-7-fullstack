@@ -120,6 +120,13 @@ app.post("/students", (req, res) => {
     res.status(201).json(newStudent);
 });
 
+// TODO: Update a student: PUT /students/:id
+app.put("/students/:id", (req, res) => {
+    // TODO: zod validation
+    // TODO: Update the data
+    // TODO: Update the json data
+});
+
 // Delete a student: DELETE /students/:id
 app.delete("/students/:id", (req, res) => {
     // Make a validation schema
