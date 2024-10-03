@@ -1,4 +1,5 @@
 const express = require("express"); // Import express with non-module
+const fs = require("fs");
 const students = require("./data/students.json"); // Import data student
 
 /* Make/initiate expess application */
@@ -106,6 +107,11 @@ app.post("/students", (req, res) => {
     students.push(newStudent);
 
     // TODO: save the latest data to json
+    fs.writeFileSync(
+        "./data/students.json",
+        JSON.stringify(students, null, 2),
+        "utf-8"
+    );
 
     res.status(201).json(newStudent);
 });
