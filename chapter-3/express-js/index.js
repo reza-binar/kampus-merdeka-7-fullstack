@@ -83,21 +83,86 @@ app.post("/students", (req, res) => {
         });
     }
 
-    /* Add data to current array students */
+    // Find the max index to defnine the new data id
+    const maxId = students.reduce(
+        (max, student) => student.id > max && student.id,
+        0
+    );
+
+    // let max = 0;
+    // for (let index = 0; index < students.length; index++) {
+    //     if (students[index].id > max) {
+    //         max = students[index].id;
+    //     }
+    // }
+    // let max = 0;
+    // students.map((student) => {
+    //     if (student.id > max) {
+    //         max = student.id;
+    //     }
+    // });
+
     const newStudent = {
-        id: students.length + 1,
+        id: maxId + 1,
         ...req.body,
     };
+
+    /* Add data to current array students */
     students.push(newStudent);
 
-    // TODO: save the latest data to json
+    // Save the latest data to json
     fs.writeFileSync(
         "./data/students.json",
-        JSON.stringify(students, null, 2),
+        JSON.stringify(students, null, 4),
         "utf-8"
     );
 
     res.status(201).json(newStudent);
+});
+
+// Delete a student: DELETE /students/:id
+app.delete("/students/:id", (req, res) => {
+    // Make a validation schema
+    const validateParams = z.object({
+        id: z.string(),
+    });
+
+    const result = validateParams.safeParse(req.params);
+    if (!result.success) {
+        // If validation fails, return error messages
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: result.error.errors.map((err) => ({
+                field: err.path[0],
+                issue: err.message,
+            })),
+        });
+    }
+
+    // Get the id from params
+    const { id } = req.params;
+
+    // Find index
+    const studentIndex = students.findIndex((student) => student.id == id);
+
+    // If the index found
+    if (studentIndex >= 0) {
+        const deletedStudent = students.splice(studentIndex, 1);
+
+        // Update the json
+        fs.writeFileSync(
+            "./data/students.json",
+            JSON.stringify(students, null, 4),
+            "utf-8"
+        );
+
+        return res
+            .status(200)
+            .json({ message: "Success", data: deletedStudent });
+    }
+
+    // If no index found
+    res.status({ message: "Student not found!" });
 });
 
 /* Run the express.js application */
