@@ -25,7 +25,17 @@ app.get("/students/:id", (req, res) => {
         id: z.string(),
     });
 
-    validateParams.parse(req.params);
+    const result = validateParams.safeParse(req.params);
+    if (!result.success) {
+        // If validation fails, return error messages
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: result.error.errors.map((err) => ({
+                field: err.path[0],
+                issue: err.message,
+            })),
+        });
+    }
 
     // Get the id from params
     const { id } = req.params;
