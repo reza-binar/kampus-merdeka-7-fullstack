@@ -76,5 +76,15 @@
     "education": {
       "bachelor": "Universitas Jambi"
     }
+  },
+  {
+    "id": 7,
+    "name": "Rheno Julius Andreas",
+    "nickName": "Rheno",
+    "class": "FSW-1",
+    "address": {
+      "province": "Jambi",
+      "city": "Jambi"
+    }
   }
 ]

@@ -1,5 +1,6 @@
 const express = require("express"); // Import express with non-module
 const fs = require("fs");
+const { z } = require("zod");
 const students = require("./data/students.json"); // Import data student
 
 /* Make/initiate expess application */
@@ -19,6 +20,13 @@ app.get("/students", (req, res) => {
 });
 
 app.get("/students/:id", (req, res) => {
+    // Make a validation schema
+    const validateParams = z.object({
+        id: z.string(),
+    });
+
+    validateParams.parse(req.params);
+
     // Get the id from params
     const { id } = req.params;
 
@@ -35,74 +43,40 @@ app.get("/students/:id", (req, res) => {
 });
 
 app.post("/students", (req, res) => {
-    /* Validate the input from user */
-    const { name, nickName, address, education } = req.body;
-    if (!name || name == "") {
-        res.status(400).json({
-            message: "Name is required!",
-        });
-        return;
-    }
-    if (!nickName || nickName == "") {
-        res.status(400).json({
-            message: "Nickname is required!",
-        });
-        return;
-    }
-    if (!req.body.class || req.body.class == "") {
-        res.status(400).json({
-            message: "Class is required!",
-        });
-        return;
-    }
-    if (!address) {
-        res.status(400).json({
-            message: "Address is required!",
-        });
-        return;
-    }
-    if (!education) {
-        res.status(400).json({
-            message: "Education is required!",
-        });
-        return;
-    }
+    // Validation body schema
+    const validateBody = z.object({
+        name: z.string(),
+        nickName: z.string(),
+        class: z.string(),
+        address: z.object({
+            province: z.string(),
+            city: z.string(),
+        }),
+        education: z
+            .object({
+                bachelor: z.string().optional().nullable(),
+            })
+            .optional()
+            .nullable(),
+    });
 
-    const { province, city } = address;
-    if (!province) {
-        res.status(400).json({
-            message: "Province is required!",
+    // Validate
+    const result = validateBody.safeParse(req.body);
+    if (!result.success) {
+        // If validation fails, return error messages
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: result.error.errors.map((err) => ({
+                field: err.path[0],
+                issue: err.message,
+            })),
         });
-        return;
-    }
-    if (!city) {
-        res.status(400).json({
-            message: "City is required!",
-        });
-        return;
-    }
-
-    const { bachelor } = education;
-    if (!bachelor) {
-        res.status(400).json({
-            message: "Bachelor is required!",
-        });
-        return;
     }
 
     /* Add data to current array students */
     const newStudent = {
         id: students.length + 1,
-        name,
-        nickName,
-        class: req.body.class,
-        address: {
-            province,
-            city,
-        },
-        education: {
-            bachelor,
-        },
+        ...req.body,
     };
     students.push(newStudent);
 
