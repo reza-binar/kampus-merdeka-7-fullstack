@@ -1,11 +1,8 @@
 const express = require("express"); // Import express with non-module
+require("express-async-errors");
 const fs = require("fs");
 const { z } = require("zod");
 const students = require("./data/students.json"); // Import data student
-
-/* Make/initiate expess application */
-const app = express();
-const port = 4000;
 
 // Standarize response
 const successResponse = (res, data) => {
@@ -14,6 +11,18 @@ const successResponse = (res, data) => {
         data,
     });
 };
+
+class BadRequestError extends Error {
+    constructor(errors) {
+        super("Validation failed!");
+        this.errors = errors;
+        this.status = 400;
+    }
+}
+
+/* Make/initiate expess application */
+const app = express();
+const port = 4000;
 
 /* We need to activate body parser/reader */
 app.use(express.json());
@@ -24,56 +33,45 @@ app.get("/", (req, res) => {
 });
 
 app.get("/students", (req, res, next) => {
-    try {
-        // students?name=BAMARAMZY&nickName=ramzy
-        // Validate the query
-        const validateQuery = z.object({
-            name: z.string().optional(),
-            nickName: z.string().optional(),
-            bachelor: z.string().optional(),
-        });
+    // Validate the query
+    const validateQuery = z.object({
+        name: z.string(),
+        nickName: z.string().optional(),
+        bachelor: z.string().optional(),
+    });
 
-        const resultValidateQuery = validateQuery.safeParse(req.params);
-        if (!resultValidateQuery.success) {
-            // If validation fails, return error messages
-            return res.status(400).json({
-                message: "Validation failed",
-                errors: resultValidateQuery.error.errors.map((err) => ({
-                    field: err.path[0],
-                    issue: err.message,
-                })),
-            });
+    const resultValidateQuery = validateQuery.safeParse(req.params);
+    if (!resultValidateQuery.success) {
+        // If validation fails, return error messages
+        throw new BadRequestError(resultValidateQuery.error.errors.map);
+    }
+
+    const searchedStudent = students.filter((student) => {
+        // Do filter logic here
+        let result = true;
+        if (req.query.name) {
+            const isFoundName = student.name
+                .toLowerCase()
+                .includes(req.query.name.toLowerCase());
+            result = result && isFoundName;
+        }
+        if (req.query.nickName) {
+            const isFoundNickName = student.nickName
+                .toLowerCase()
+                .includes(req.query.nickName.toLowerCase());
+            result = result && isFoundNickName;
+        }
+        if (req.query.bachelor) {
+            const isFoundBachelor = student.education.bachelor
+                .toLowerCase()
+                .includes(req.query.bachelor.toLowerCase());
+            result = result && isFoundBachelor;
         }
 
-        const searchedStudent = students.filter((student) => {
-            // Do filter logic here
-            let result = true;
-            if (req.query.name) {
-                const isFoundName = student.name
-                    .toLowerCase()
-                    .includes(req.query.name.toLowerCase());
-                result = result && isFoundName;
-            }
-            if (req.query.nickName) {
-                const isFoundNickName = student.nickName
-                    .toLowerCase()
-                    .includes(req.query.nickName.toLowerCase());
-                result = result && isFoundNickName;
-            }
-            if (req.query.bachelor) {
-                const isFoundBachelor = student.education.bachelor
-                    .toLowerCase()
-                    .includes(req.query.bachelor.toLowerCase());
-                result = result && isFoundBachelor;
-            }
+        return result;
+    });
 
-            return result;
-        });
-
-        successResponse(res, searchedStudent);
-    } catch (error) {
-        next(error);
-    }
+    successResponse(res, searchedStudent);
 });
 
 app.get("/students/:id", (req, res) => {
@@ -85,13 +83,7 @@ app.get("/students/:id", (req, res) => {
     const result = validateParams.safeParse(req.params);
     if (!result.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: result.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        throw new BadRequestError(result.error.errors);
     }
 
     // Get the id from params
@@ -101,6 +93,7 @@ app.get("/students/:id", (req, res) => {
     const student = students.find((student) => student.id == id);
     if (!student) {
         // If there is no student with the id that client request, it will response not found
+        // TODO: make a error class
         return res.status(404).json({ message: "Student not found!" });
     }
 
@@ -130,13 +123,7 @@ app.post("/students", (req, res) => {
     const result = validateBody.safeParse(req.body);
     if (!result.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: result.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        throw new BadRequestError(result.error.errors);
     }
 
     // Find the max index to defnine the new data id
@@ -186,13 +173,7 @@ app.put("/students/:id", (req, res) => {
     const resultValidateParams = validateParams.safeParse(req.params);
     if (!resultValidateParams.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: resultValidateParams.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        throw new BadRequestError(result.error.errors);
     }
 
     // Validation body schema
@@ -216,19 +197,14 @@ app.put("/students/:id", (req, res) => {
     const resultValidateBody = validateBody.safeParse(req.body);
     if (!resultValidateBody.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: resultValidateBody.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        throw new BadRequestError(result.error.errors);
     }
 
     // Find the existing student data
     const id = Number(req.params.id);
     const student = students.find((student) => student.id === id);
     if (!student) {
+        // TODO: make a error class
         return res.status(404).json({
             message: "Student not found!",
         });
@@ -257,13 +233,7 @@ app.delete("/students/:id", (req, res) => {
     const result = validateParams.safeParse(req.params);
     if (!result.success) {
         // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: result.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
-        });
+        throw new BadRequestError(result.error.errors);
     }
 
     // Get the id from params
@@ -274,7 +244,8 @@ app.delete("/students/:id", (req, res) => {
 
     if (studentIndex < 0) {
         // If no index found
-        return res.status.json({ message: "Student not found!" });
+        // TODO: make a error class
+        return res.status(404).json({ message: "Student not found!" });
     }
 
     // If the index found
