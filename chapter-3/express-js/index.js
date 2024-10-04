@@ -7,6 +7,14 @@ const students = require("./data/students.json"); // Import data student
 const app = express();
 const port = 4000;
 
+// Standarize response
+const successResponse = (res, data) => {
+    res.status(200).json({
+        success: true,
+        data,
+    });
+};
+
 /* We need to activate body parser/reader */
 app.use(express.json());
 
@@ -61,7 +69,7 @@ app.get("/students", (req, res) => {
         return result;
     });
 
-    res.status(200).json(searchedStudent);
+    successResponse(res, searchedStudent);
 });
 
 app.get("/students/:id", (req, res) => {
@@ -87,14 +95,13 @@ app.get("/students/:id", (req, res) => {
 
     // find student by id
     const student = students.find((student) => student.id == id);
-    // If student has been found, it will be response the student data
-    if (student) {
-        res.json(student);
-        return;
+    if (!student) {
+        // If there is no student with the id that client request, it will response not found
+        return res.status(404).json({ message: "Student not found!" });
     }
 
-    // If there is no student with the id that client request, it will response not found
-    res.status(404).json({ message: "Student not found!" });
+    // If student has been found, it will be response the student data
+    successResponse(res, student);
 });
 
 app.post("/students", (req, res) => {
@@ -162,7 +169,7 @@ app.post("/students", (req, res) => {
         "utf-8"
     );
 
-    res.status(201).json(newStudent);
+    successResponse(res, newStudent);
 });
 
 // Update a student: PUT /students/:id
@@ -233,7 +240,7 @@ app.put("/students/:id", (req, res) => {
         "utf-8"
     );
 
-    res.status(200).json(student);
+    successResponse(res, student);
 });
 
 // Delete a student: DELETE /students/:id
@@ -261,24 +268,22 @@ app.delete("/students/:id", (req, res) => {
     // Find index
     const studentIndex = students.findIndex((student) => student.id == id);
 
-    // If the index found
-    if (studentIndex >= 0) {
-        const deletedStudent = students.splice(studentIndex, 1);
-
-        // Update the json
-        fs.writeFileSync(
-            "./data/students.json",
-            JSON.stringify(students, null, 4),
-            "utf-8"
-        );
-
-        return res
-            .status(200)
-            .json({ message: "Success", data: deletedStudent });
+    if (studentIndex < 0) {
+        // If no index found
+        return res.status.json({ message: "Student not found!" });
     }
 
-    // If no index found
-    res.status({ message: "Student not found!" });
+    // If the index found
+    const deletedStudent = students.splice(studentIndex, 1);
+
+    // Update the json
+    fs.writeFileSync(
+        "./data/students.json",
+        JSON.stringify(students, null, 4),
+        "utf-8"
+    );
+
+    successResponse(res, deletedStudent);
 });
 
 /* Run the express.js application */
