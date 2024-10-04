@@ -16,11 +16,12 @@ app.get("/", (req, res) => {
 });
 
 app.get("/students", (req, res) => {
-    // students?name=BAMARAMZY -> ramzy
+    // students?name=BAMARAMZY&nickName=ramzy
     // Validate the query
     const validateQuery = z.object({
         name: z.string().optional(),
         nickName: z.string().optional(),
+        bachelor: z.string().optional(),
     });
 
     const resultValidateQuery = validateQuery.safeParse(req.params);
@@ -36,14 +37,28 @@ app.get("/students", (req, res) => {
     }
 
     const searchedStudent = students.filter((student) => {
-        // TODO: Do filter logic here
+        // Do filter logic here
+        let result = true;
         if (req.query.name) {
-            return student.name
+            const isFoundName = student.name
                 .toLowerCase()
                 .includes(req.query.name.toLowerCase());
+            result = result && isFoundName;
+        }
+        if (req.query.nickName) {
+            const isFoundNickName = student.nickName
+                .toLowerCase()
+                .includes(req.query.nickName.toLowerCase());
+            result = result && isFoundNickName;
+        }
+        if (req.query.bachelor) {
+            const isFoundBachelor = student.education.bachelor
+                .toLowerCase()
+                .includes(req.query.bachelor.toLowerCase());
+            result = result && isFoundBachelor;
         }
 
-        return true;
+        return result;
     });
 
     res.status(200).json(searchedStudent);
