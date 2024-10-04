@@ -23,53 +23,57 @@ app.get("/", (req, res) => {
     res.send(`Hello World, I am using nodemon!`);
 });
 
-app.get("/students", (req, res) => {
-    // students?name=BAMARAMZY&nickName=ramzy
-    // Validate the query
-    const validateQuery = z.object({
-        name: z.string().optional(),
-        nickName: z.string().optional(),
-        bachelor: z.string().optional(),
-    });
-
-    const resultValidateQuery = validateQuery.safeParse(req.params);
-    if (!resultValidateQuery.success) {
-        // If validation fails, return error messages
-        return res.status(400).json({
-            message: "Validation failed",
-            errors: resultValidateQuery.error.errors.map((err) => ({
-                field: err.path[0],
-                issue: err.message,
-            })),
+app.get("/students", (req, res, next) => {
+    try {
+        // students?name=BAMARAMZY&nickName=ramzy
+        // Validate the query
+        const validateQuery = z.object({
+            name: z.string().optional(),
+            nickName: z.string().optional(),
+            bachelor: z.string().optional(),
         });
+
+        const resultValidateQuery = validateQuery.safeParse(req.params);
+        if (!resultValidateQuery.success) {
+            // If validation fails, return error messages
+            return res.status(400).json({
+                message: "Validation failed",
+                errors: resultValidateQuery.error.errors.map((err) => ({
+                    field: err.path[0],
+                    issue: err.message,
+                })),
+            });
+        }
+
+        const searchedStudent = students.filter((student) => {
+            // Do filter logic here
+            let result = true;
+            if (req.query.name) {
+                const isFoundName = student.name
+                    .toLowerCase()
+                    .includes(req.query.name.toLowerCase());
+                result = result && isFoundName;
+            }
+            if (req.query.nickName) {
+                const isFoundNickName = student.nickName
+                    .toLowerCase()
+                    .includes(req.query.nickName.toLowerCase());
+                result = result && isFoundNickName;
+            }
+            if (req.query.bachelor) {
+                const isFoundBachelor = student.education.bachelor
+                    .toLowerCase()
+                    .includes(req.query.bachelor.toLowerCase());
+                result = result && isFoundBachelor;
+            }
+
+            return result;
+        });
+
+        successResponse(res, searchedStudent);
+    } catch (error) {
+        next(error);
     }
-
-    const searchedStudent = students.filter((student) => {
-        // Do filter logic here
-        let result = true;
-        if (req.query.name) {
-            const isFoundName = student.name
-                .toLowerCase()
-                .includes(req.query.name.toLowerCase());
-            result = result && isFoundName;
-        }
-        if (req.query.nickName) {
-            const isFoundNickName = student.nickName
-                .toLowerCase()
-                .includes(req.query.nickName.toLowerCase());
-            result = result && isFoundNickName;
-        }
-        if (req.query.bachelor) {
-            const isFoundBachelor = student.education.bachelor
-                .toLowerCase()
-                .includes(req.query.bachelor.toLowerCase());
-            result = result && isFoundBachelor;
-        }
-
-        return result;
-    });
-
-    successResponse(res, searchedStudent);
 });
 
 app.get("/students/:id", (req, res) => {
@@ -284,6 +288,23 @@ app.delete("/students/:id", (req, res) => {
     );
 
     successResponse(res, deletedStudent);
+});
+
+// This function is to handle error when API hit
+app.use((err, req, res, next) => {
+    const status = err.status || 500;
+    const errors = err.errors || [];
+    let message = err.message;
+    if (status == 500) {
+        message = "Internal Server Error";
+    }
+
+    res.status(status).json({
+        success: false,
+        data: null,
+        message,
+        errors,
+    });
 });
 
 /* Run the express.js application */
