@@ -16,7 +16,37 @@ app.get("/", (req, res) => {
 });
 
 app.get("/students", (req, res) => {
-    res.json(students);
+    // students?name=BAMARAMZY -> ramzy
+    // Validate the query
+    const validateQuery = z.object({
+        name: z.string().optional(),
+        nickName: z.string().optional(),
+    });
+
+    const resultValidateQuery = validateQuery.safeParse(req.params);
+    if (!resultValidateQuery.success) {
+        // If validation fails, return error messages
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: resultValidateQuery.error.errors.map((err) => ({
+                field: err.path[0],
+                issue: err.message,
+            })),
+        });
+    }
+
+    const searchedStudent = students.filter((student) => {
+        // TODO: Do filter logic here
+        if (req.query.name) {
+            return student.name
+                .toLowerCase()
+                .includes(req.query.name.toLowerCase());
+        }
+
+        return true;
+    });
+
+    res.status(200).json(searchedStudent);
 });
 
 app.get("/students/:id", (req, res) => {
@@ -120,7 +150,7 @@ app.post("/students", (req, res) => {
     res.status(201).json(newStudent);
 });
 
-// TODO: Update a student: PUT /students/:id
+// Update a student: PUT /students/:id
 app.put("/students/:id", (req, res) => {
     // zod validation
     const validateParams = z.object({
