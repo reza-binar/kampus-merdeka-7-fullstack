@@ -17,7 +17,16 @@ class NotFoundError extends Error {
     }
 }
 
+class InternalServerError extends Error {
+    constructor(errors) {
+        super("Internal Server Error");
+        this.status = 500;
+        this.errors = errors;
+    }
+}
+
 module.exports = {
     BadRequestError,
     NotFoundError,
+    InternalServerError,
 };

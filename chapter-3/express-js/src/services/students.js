@@ -1,11 +1,17 @@
 const studentRepository = require("../repositories/students");
+const { NotFoundError, InternalServerError } = require("../utils/request");
 
 exports.getStudents = (name, nickName, bachelor) => {
     return studentRepository.getStudents(name, nickName, bachelor);
 };
 
 exports.getStudentById = (id) => {
-    return studentRepository.getStudentById(id);
+    const student = studentRepository.getStudentById(id);
+    if (student) {
+        throw new NotFoundError("Student is Not Found!");
+    }
+
+    return student;
 };
 
 exports.createStudent = (data) => {
@@ -13,32 +19,32 @@ exports.createStudent = (data) => {
 };
 
 exports.updateStudent = (id, data) => {
-    // find student is exist or not
+    // find student is exist or not (validate the data)
     const existingStudent = studentRepository.getStudentById(id);
     if (!existingStudent) {
-        return null;
+        throw new NotFoundError("Student is Not Found!");
     }
 
     // if exist, we will delete the student data
     const updatedStudent = studentRepository.updateStudent(id, data);
     if (!updatedStudent) {
-        return null;
+        throw new InternalServerError(["Failed to update student!"]);
     }
 
     return updatedStudent;
 };
 
 exports.deleteStudentById = (id) => {
-    // find student is exist or not
+    // find student is exist or not (validate the data)
     const existingStudent = studentRepository.getStudentById(id);
     if (!existingStudent) {
-        return null;
+        throw new NotFoundError("Student is Not Found!");
     }
 
     // if exist, we will delete the student data
     const deletedStudent = studentRepository.deleteStudentById(id);
     if (!deletedStudent) {
-        return null;
+        throw new InternalServerError(["Failed to delete student!"]);
     }
 
     return deletedStudent;
