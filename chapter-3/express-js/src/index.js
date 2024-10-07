@@ -16,7 +16,7 @@ app.use("/", router);
 // This function is for 404 handle URL
 app.use("*", notFoundURLHandler);
 
-// This function is to handle error when API hit
+// This function is to handle error when API hit, it always be the last middleware
 app.use(errorHandler);
 
 /* Run the express.js application */
