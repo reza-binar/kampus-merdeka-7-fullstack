@@ -20,6 +20,17 @@ class BadRequestError extends Error {
     }
 }
 
+class NotFoundError extends Error {
+    constructor(message) {
+        if (message) {
+            super(message);
+        } else {
+            super("Data is Not Found!");
+        }
+        this.status = 404;
+    }
+}
+
 /* Make/initiate expess application */
 const app = express();
 const port = 4000;
@@ -93,8 +104,7 @@ app.get("/students/:id", (req, res) => {
     const student = students.find((student) => student.id == id);
     if (!student) {
         // If there is no student with the id that client request, it will response not found
-        // TODO: make a error class
-        return res.status(404).json({ message: "Student not found!" });
+        throw new NotFoundError("Student is Not Found!");
     }
 
     // If student has been found, it will be response the student data
@@ -204,10 +214,8 @@ app.put("/students/:id", (req, res) => {
     const id = Number(req.params.id);
     const student = students.find((student) => student.id === id);
     if (!student) {
-        // TODO: make a error class
-        return res.status(404).json({
-            message: "Student not found!",
-        });
+        // Make a error class
+        throw new NotFoundError("Student is Not Found!");
     }
 
     // Update the data
@@ -244,8 +252,7 @@ app.delete("/students/:id", (req, res) => {
 
     if (studentIndex < 0) {
         // If no index found
-        // TODO: make a error class
-        return res.status(404).json({ message: "Student not found!" });
+        throw new NotFoundError("Student is Not Found!");
     }
 
     // If the index found
