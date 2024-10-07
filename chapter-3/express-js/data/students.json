@@ -13,19 +13,6 @@
         }
     },
     {
-        "id": 2,
-        "name": "Yudriqul Aulia",
-        "nickName": "Yudi",
-        "class": "FSW-1",
-        "address": {
-            "province": "Jambi",
-            "city": "Jambi"
-        },
-        "education": {
-            "bachelor": "Universitas Jambi"
-        }
-    },
-    {
         "id": 3,
         "name": "Iko Indra Gunawan",
         "nickName": "Iko",
@@ -81,6 +68,19 @@
         "id": 8,
         "name": "Muhammad Ferdy",
         "nickName": "Muh",
+        "class": "FSW-1",
+        "address": {
+            "province": "Jambi",
+            "city": "Jambi"
+        },
+        "education": {
+            "bachelor": "Universitas Jambi"
+        }
+    },
+    {
+        "id": 9,
+        "name": "Nabilah Zakiyah",
+        "nickName": "Zaki",
         "class": "FSW-1",
         "address": {
             "province": "Jambi",
