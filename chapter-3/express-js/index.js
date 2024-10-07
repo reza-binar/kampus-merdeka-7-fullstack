@@ -3,33 +3,7 @@ require("express-async-errors");
 const fs = require("fs");
 const { z } = require("zod");
 const students = require("./data/students.json"); // Import data student
-
-// Standarize response
-const successResponse = (res, data) => {
-    res.status(200).json({
-        success: true,
-        data,
-    });
-};
-
-class BadRequestError extends Error {
-    constructor(errors) {
-        super("Validation failed!");
-        this.errors = errors;
-        this.status = 400;
-    }
-}
-
-class NotFoundError extends Error {
-    constructor(message) {
-        if (message) {
-            super(message);
-        } else {
-            super("Data is Not Found!");
-        }
-        this.status = 404;
-    }
-}
+const router = require("./src/routes");
 
 /* Make/initiate expess application */
 const app = express();
@@ -43,47 +17,7 @@ app.get("/", (req, res) => {
     res.send(`Hello World, I am using nodemon!`);
 });
 
-app.get("/students", (req, res, next) => {
-    // Validate the query
-    const validateQuery = z.object({
-        name: z.string(),
-        nickName: z.string().optional(),
-        bachelor: z.string().optional(),
-    });
-
-    const resultValidateQuery = validateQuery.safeParse(req.params);
-    if (!resultValidateQuery.success) {
-        // If validation fails, return error messages
-        throw new BadRequestError(resultValidateQuery.error.errors.map);
-    }
-
-    const searchedStudent = students.filter((student) => {
-        // Do filter logic here
-        let result = true;
-        if (req.query.name) {
-            const isFoundName = student.name
-                .toLowerCase()
-                .includes(req.query.name.toLowerCase());
-            result = result && isFoundName;
-        }
-        if (req.query.nickName) {
-            const isFoundNickName = student.nickName
-                .toLowerCase()
-                .includes(req.query.nickName.toLowerCase());
-            result = result && isFoundNickName;
-        }
-        if (req.query.bachelor) {
-            const isFoundBachelor = student.education.bachelor
-                .toLowerCase()
-                .includes(req.query.bachelor.toLowerCase());
-            result = result && isFoundBachelor;
-        }
-
-        return result;
-    });
-
-    successResponse(res, searchedStudent);
-});
+app.use("/", router);
 
 app.get("/students/:id", (req, res) => {
     // Make a validation schema
@@ -276,6 +210,8 @@ app.use((err, req, res, next) => {
     if (status == 500) {
         message = "Internal Server Error";
     }
+
+    console.error(err);
 
     res.status(status).json({
         success: false,
