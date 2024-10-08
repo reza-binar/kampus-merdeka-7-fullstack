@@ -89,5 +89,29 @@
         "education": {
             "bachelor": "Universitas Jambi"
         }
+    },
+    {
+        "id": 10,
+        "name": "Jovina Gustari Juwita",
+        "nickName": "Jovina",
+        "class": "FSW-1",
+        "address": {
+            "province": "Jambi",
+            "city": "Jambi"
+        },
+        "education": {},
+        "profilePicture": "https://ik.imagekit.io/falfarezabinar/img_car__1__N9y0_AGDA.png"
+    },
+    {
+        "id": 11,
+        "name": "Jovina Gustari Juwita",
+        "nickName": "Jovina",
+        "class": "FSW-1",
+        "address": {
+            "province": "Jambi",
+            "city": "Jambi"
+        },
+        "education": {},
+        "profilePicture": "https://ik.imagekit.io/falfarezabinar/img_car__1__0dVnN9ae6.png"
     }
 ]
