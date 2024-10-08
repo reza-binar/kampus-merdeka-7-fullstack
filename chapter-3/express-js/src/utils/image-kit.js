@@ -6,8 +6,6 @@ const imagekit = new ImageKit({
     urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
 });
 
-console.log(process.env);
-
 // Image upload function to imagekit
 exports.imageUpload = async (file) => {
     const uploadedFile = await imagekit.upload({
