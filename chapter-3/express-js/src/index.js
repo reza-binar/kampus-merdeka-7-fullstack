@@ -1,7 +1,7 @@
 require("dotenv").config(); // To enable .env called
 const express = require("express"); // Import express with non-module
 require("express-async-errors");
-const fileUpload = require("express-fileupload");
+const fileUpload = require("express-fileupload"); // This package is to enable req.files
 const router = require("./routes");
 const { errorHandler, notFoundURLHandler } = require("./middlewares/errors");
 
@@ -9,10 +9,10 @@ const { errorHandler, notFoundURLHandler } = require("./middlewares/errors");
 const app = express();
 const port = 4000;
 
-/* We need to activate body parser/reader */
+/* We need to activate body parser/reader (req.body) */
 app.use(express.json());
 
-/* We need to read form-body (body parser/reader) if you want upload file */
+/* We need to read form-body (body parser/reader) (req.files) if you want upload file */
 app.use(
     fileUpload({
         limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB

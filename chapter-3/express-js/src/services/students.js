@@ -21,6 +21,7 @@ exports.createStudent = async (data, file) => {
         data.profilePicture = await imageUpload(file.profilePicture);
     }
 
+    // Create the data
     return studentRepository.createStudent(data);
 };
 

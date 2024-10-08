@@ -14,6 +14,8 @@ exports.getStudents = (req, res, next) => {
 exports.getStudentById = (req, res, next) => {
     // Get the id from params
     const { id } = req.params;
+
+    // Get student by id
     const data = studentService.getStudentById(id);
     successResponse(res, data);
 };
@@ -34,6 +36,7 @@ exports.createStudent = async (req, res, next) => {
     delete requestBody["address.city"];
     delete requestBody["education.bachelor"];
 
+    // Create the new student
     const data = await studentService.createStudent(requestBody, req.files);
     successResponse(res, data);
 };

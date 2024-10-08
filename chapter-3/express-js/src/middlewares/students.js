@@ -44,6 +44,7 @@ exports.validateCreateStudent = (req, res, next) => {
         "education.bachelor": z.string().optional().nullable(),
     });
 
+    // The file is not required
     const validateFileBody = z
         .object({
             profilePicture: z
