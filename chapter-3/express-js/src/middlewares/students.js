@@ -84,7 +84,7 @@ exports.validateUpdateStudent = (req, res, next) => {
     const resultValidateParams = validateParams.safeParse(req.params);
     if (!resultValidateParams.success) {
         // If validation fails, return error messages
-        throw new BadRequestError(result.error.errors);
+        throw new BadRequestError(resultValidateParams.error.errors);
     }
 
     // Validation body schema
@@ -92,23 +92,37 @@ exports.validateUpdateStudent = (req, res, next) => {
         name: z.string(),
         nickName: z.string(),
         class: z.string(),
-        address: z.object({
-            province: z.string(),
-            city: z.string(),
-        }),
-        education: z
-            .object({
-                bachelor: z.string().optional().nullable(),
-            })
-            .optional()
-            .nullable(),
+        "address.city": z.string(),
+        "address.province": z.string(),
+        "education.bachelor": z.string().optional().nullable(),
     });
+
+    // The file is not required
+    const validateFileBody = z
+        .object({
+            profilePicture: z
+                .object({
+                    name: z.string(),
+                    data: z.any(),
+                })
+                .nullable()
+                .optional(),
+        })
+        .nullable()
+        .optional();
 
     // Validate
     const resultValidateBody = validateBody.safeParse(req.body);
     if (!resultValidateBody.success) {
         // If validation fails, return error messages
-        throw new BadRequestError(result.error.errors);
+        throw new BadRequestError(resultValidateBody.error.errors);
+    }
+
+    // Validate
+    const resultValidateFiles = validateFileBody.safeParse(req.files);
+    if (!resultValidateFiles.success) {
+        // If validation fails, return error messages
+        throw new BadRequestError(resultValidateFiles.error.errors);
     }
 
     next();
