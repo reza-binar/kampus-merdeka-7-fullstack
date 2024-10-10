@@ -72,6 +72,21 @@ exports.validateCreateStudent = (req, res, next) => {
         throw new BadRequestError(resultValidateFiles.error.errors);
     }
 
+    // Convert to student data format
+    req.body = {
+        ...req.body,
+        address: {
+            province: req.body["address.province"],
+            city: req.body["address.city"],
+        },
+        education: {
+            bachelor: req.body["education.bachelor"],
+        },
+    };
+    delete req.body["address.province"];
+    delete req.body["address.city"];
+    delete req.body["education.bachelor"];
+
     next();
 };
 
@@ -94,7 +109,7 @@ exports.validateUpdateStudent = (req, res, next) => {
         class: z.string(),
         "address.city": z.string(),
         "address.province": z.string(),
-        "education.bachelor": z.string().optional().nullable(),
+        "education.bachelor": z.array().optional().nullable(),
     });
 
     // The file is not required
@@ -124,6 +139,21 @@ exports.validateUpdateStudent = (req, res, next) => {
         // If validation fails, return error messages
         throw new BadRequestError(resultValidateFiles.error.errors);
     }
+
+    // Convert to student data format
+    req.body = {
+        ...req.body,
+        address: {
+            province: req.body["address.province"],
+            city: req.body["address.city"],
+        },
+        education: {
+            bachelor: req.body["education.bachelor"],
+        },
+    };
+    delete req.body["address.province"];
+    delete req.body["address.city"];
+    delete req.body["education.bachelor"];
 
     next();
 };

@@ -112,8 +112,10 @@
             "city": "Jambi"
         },
         "education": {
-            "bachelor": "Universitas Jambi"
+            "bachelor": [
+                "Universitas Jambi"
+            ]
         },
-        "profilePicture": "https://ik.imagekit.io/falfarezabinar/Mercedes_Car_EQC_300kW_Edition_-_900x598_1__1__VEXqD6FtV.png"
+        "profilePicture": "https://ik.imagekit.io/falfarezabinar/Mercedes_Car_EQC_300kW_Edition_-_900x598_1__1__NRdCW8E4c.png"
     }
 ]
