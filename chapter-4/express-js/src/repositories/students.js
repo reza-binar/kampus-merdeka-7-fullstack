@@ -6,18 +6,35 @@ const students = require("../../data/students.json");
 const prisma = new PrismaClient();
 
 exports.getStudents = async (name, nickName) => {
-    const searchedStudents = await prisma.students.findMany({
-        where: {
-            OR: [
-                { name: { contains: name, mode: "insensitive" } },
-                { nick_name: { contains: nickName, mode: "insensitive" } },
-            ],
-        },
+    // Define query here
+    let query = {
         include: {
             classes: true,
             universities: true,
         },
-    });
+    };
+
+    // It will generate the query
+    let orQuery = [];
+    if (name) {
+        orQuery.push({
+            name: { contains: name, mode: "insensitive" },
+        });
+    }
+    if (nickName) {
+        orQuery.push({
+            nick_name: { contains: nickName, mode: "insensitive" },
+        });
+    }
+    if (orQuery.length > 0) {
+        query.where = {
+            ...query.where,
+            OR: orQuery,
+        };
+    }
+
+    // Find by query
+    const searchedStudents = await prisma.students.findMany(query);
 
     // Convert BigInt fields to string for safe serialization
     const serializedStudents = JSONBigInt.stringify(searchedStudents);
