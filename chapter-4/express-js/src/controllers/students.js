@@ -10,12 +10,12 @@ exports.getStudents = async (req, res, next) => {
     successResponse(res, data);
 };
 
-exports.getStudentById = (req, res, next) => {
+exports.getStudentById = async (req, res, next) => {
     // Get the id from params
     const { id } = req.params;
 
     // Get student by id
-    const data = studentService.getStudentById(id);
+    const data = await studentService.getStudentById(id);
     successResponse(res, data);
 };
 

@@ -6,8 +6,8 @@ exports.getStudents = async (name, nickName) => {
     return studentRepository.getStudents(name, nickName);
 };
 
-exports.getStudentById = (id) => {
-    const student = studentRepository.getStudentById(id);
+exports.getStudentById = async (id) => {
+    const student = await studentRepository.getStudentById(id);
     if (!student) {
         throw new NotFoundError("Student is Not Found!");
     }

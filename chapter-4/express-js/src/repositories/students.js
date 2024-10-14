@@ -24,10 +24,17 @@ exports.getStudents = async (name, nickName) => {
     return JSONBigInt.parse(serializedStudents);
 };
 
-exports.getStudentById = (id) => {
+exports.getStudentById = async (id) => {
     // find student by id
-    const student = students.find((student) => student.id == id);
-    return student;
+    const student = await prisma.students.findFirst({
+        where: {
+            id: id,
+        },
+    });
+
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(student);
+    return JSONBigInt.parse(serializedStudents);
 };
 
 exports.createStudent = (data) => {
