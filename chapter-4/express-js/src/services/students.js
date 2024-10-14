@@ -17,8 +17,8 @@ exports.getStudentById = async (id) => {
 
 exports.createStudent = async (data, file) => {
     // Upload file to image kit
-    if (file?.profilePicture) {
-        data.profilePicture = await imageUpload(file.profilePicture);
+    if (file?.profile_picture) {
+        data.profile_picture = await imageUpload(file.profile_picture);
     }
 
     // Create the data

@@ -37,29 +37,14 @@ exports.getStudentById = async (id) => {
     return JSONBigInt.parse(serializedStudents);
 };
 
-exports.createStudent = (data) => {
-    // Find the max index to defnine the new data id
-    const maxId = students.reduce(
-        (max, student) => student.id > max && student.id,
-        0
-    );
+exports.createStudent = async (data) => {
+    const newStudent = await prisma.students.create({
+        data,
+    });
 
-    const newStudent = {
-        id: maxId + 1,
-        ...data,
-    };
-
-    /* Add data to current array students */
-    students.push(newStudent);
-
-    // Save the latest data to json
-    fs.writeFileSync(
-        "./data/students.json",
-        JSON.stringify(students, null, 4),
-        "utf-8"
-    );
-
-    return newStudent;
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(newStudent);
+    return JSONBigInt.parse(serializedStudents);
 };
 
 exports.updateStudent = (id, data) => {
