@@ -5,7 +5,7 @@ exports.getStudents = async (req, res, next) => {
     // Call the usecase or service
     const data = await studentService.getStudents(
         req.query?.name,
-        req.query?.nickName
+        req.query?.nick_name
     );
     successResponse(res, data);
 };
