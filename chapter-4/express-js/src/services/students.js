@@ -2,8 +2,8 @@ const studentRepository = require("../repositories/students");
 const { imageUpload } = require("../utils/image-kit");
 const { NotFoundError, InternalServerError } = require("../utils/request");
 
-exports.getStudents = (name, nickName, bachelor) => {
-    return studentRepository.getStudents(name, nickName, bachelor);
+exports.getStudents = async (name, nickName) => {
+    return studentRepository.getStudents(name, nickName);
 };
 
 exports.getStudentById = (id) => {

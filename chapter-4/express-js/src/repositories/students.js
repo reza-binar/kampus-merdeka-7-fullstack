@@ -1,32 +1,27 @@
 const fs = require("fs");
+const { PrismaClient } = require("@prisma/client");
+const JSONBigInt = require("json-bigint");
 const students = require("../../data/students.json");
 
-exports.getStudents = (name, nickName, bachelor) => {
-    const searchedStudent = students.filter((student) => {
-        // Do filter logic here
-        let result = true;
-        if (name) {
-            const isFoundName = student.name
-                .toLowerCase()
-                .includes(name.toLowerCase());
-            result = result && isFoundName;
-        }
-        if (nickName) {
-            const isFoundNickName = student.nickName
-                .toLowerCase()
-                .includes(nickName.toLowerCase());
-            result = result && isFoundNickName;
-        }
-        if (bachelor) {
-            const isFoundBachelor = student.education.bachelor
-                .toLowerCase()
-                .includes(bachelor.toLowerCase());
-            result = result && isFoundBachelor;
-        }
+const prisma = new PrismaClient();
 
-        return result;
+exports.getStudents = async (name, nickName) => {
+    const searchedStudents = await prisma.students.findMany({
+        where: {
+            OR: [
+                { name: { contains: name, mode: "insensitive" } },
+                { nick_name: { contains: nickName, mode: "insensitive" } },
+            ],
+        },
+        include: {
+            classes: true,
+            universities: true,
+        },
     });
-    return searchedStudent;
+
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(searchedStudents);
+    return JSONBigInt.parse(serializedStudents);
 };
 
 exports.getStudentById = (id) => {
