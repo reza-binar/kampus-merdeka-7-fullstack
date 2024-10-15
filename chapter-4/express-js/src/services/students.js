@@ -39,8 +39,8 @@ exports.updateStudent = async (id, data, file) => {
     };
 
     // Upload file to image kit
-    if (file?.profilePicture) {
-        data.profilePicture = await imageUpload(file.profilePicture);
+    if (file?.profile_picture) {
+        data.profile_picture = await imageUpload(file.profile_picture);
     }
 
     // if exist, we will update the student data
@@ -52,15 +52,15 @@ exports.updateStudent = async (id, data, file) => {
     return updatedStudent;
 };
 
-exports.deleteStudentById = (id) => {
+exports.deleteStudentById = async (id) => {
     // find student is exist or not (validate the data)
-    const existingStudent = studentRepository.getStudentById(id);
+    const existingStudent = await studentRepository.getStudentById(id);
     if (!existingStudent) {
         throw new NotFoundError("Student is Not Found!");
     }
 
     // if exist, we will delete the student data
-    const deletedStudent = studentRepository.deleteStudentById(id);
+    const deletedStudent = await studentRepository.deleteStudentById(id);
     if (!deletedStudent) {
         throw new InternalServerError(["Failed to delete student!"]);
     }

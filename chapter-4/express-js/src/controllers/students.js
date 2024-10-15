@@ -32,9 +32,9 @@ exports.updateStudent = async (req, res, next) => {
     successResponse(res, data);
 };
 
-exports.deleteStudentById = (req, res, next) => {
+exports.deleteStudentById = async (req, res, next) => {
     // Get the id from params
     const { id } = req.params;
-    const data = studentService.deleteStudentById(id);
+    const data = await studentService.deleteStudentById(id);
     successResponse(res, data);
 };
