@@ -31,5 +31,6 @@ model universities {
   description String
   city        String     @db.VarChar(255)
   country     String     @db.VarChar(255)
+  province    String?    @db.VarChar(255)
   students    students[]
 }
