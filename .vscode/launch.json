@@ -21,6 +21,15 @@
             "cwd": "${workspaceFolder}/chapter-4/express-js",
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run", "dev"] // Corrected this line
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Chapter 5 - Express.js",
+            "skipFiles": ["<node_internals>/**"],
+            "cwd": "${workspaceFolder}/chapter-5/express-js",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"] // Corrected this line
         }
     ]
 }
