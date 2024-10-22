@@ -30,3 +30,15 @@ exports.getUserByEmail = async (email) => {
     const serializedStudents = JSONBigInt.stringify(user);
     return JSONBigInt.parse(serializedStudents);
 };
+
+exports.getUserById = async (id) => {
+    const user = await prisma.users.findFirst({
+        where: {
+            id,
+        },
+    });
+
+    // Convert BigInt fields to string for safe serialization
+    const serializedStudents = JSONBigInt.stringify(user);
+    return JSONBigInt.parse(serializedStudents);
+};

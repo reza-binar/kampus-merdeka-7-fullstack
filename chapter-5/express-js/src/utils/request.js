@@ -36,9 +36,21 @@ class Unauthorized extends Error {
     }
 }
 
+class Forbidden extends Error {
+    constructor(message) {
+        if (message) {
+            super(message);
+        } else {
+            super("Forbidden!");
+        }
+        this.status = 403;
+    }
+}
+
 module.exports = {
     BadRequestError,
     NotFoundError,
     InternalServerError,
     Unauthorized,
+    Forbidden,
 };
