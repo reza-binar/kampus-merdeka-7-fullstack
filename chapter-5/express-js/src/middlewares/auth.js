@@ -39,3 +39,20 @@ exports.validateRegister = (req, res, next) => {
 
     next();
 };
+
+exports.validateLogin = (req, res, next) => {
+    // Validation body schema
+    const validateBody = z.object({
+        email: z.string().email(),
+        password: z.string(),
+    });
+
+    // Validate
+    const resultValidateBody = validateBody.safeParse(req.body);
+    if (!resultValidateBody.success) {
+        // If validation fails, return error messages
+        throw new BadRequestError(resultValidateBody.error.errors);
+    }
+
+    next();
+};
