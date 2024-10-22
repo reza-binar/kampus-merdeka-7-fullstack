@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const {
     BadRequestError,
     Unauthorized,
-    For,
     Forbidden,
 } = require("../utils/request");
 const userRepository = require("../repositories/users");
@@ -35,6 +34,9 @@ exports.authorization =
         if (!accessValidation) {
             throw new Forbidden("You can not access this resource!");
         }
+
+        // pass the user to request, then every middleware can access the user profile without needing to get again in repository level
+        req.user = user;
 
         next();
     };
