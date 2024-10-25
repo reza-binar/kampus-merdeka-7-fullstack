@@ -24,19 +24,24 @@ function Login() {
             password,
         };
 
-        try {
-            const response = await fetch("http://localhost:4000/auth/login", {
-                body: JSON.stringify(body),
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            const { data } = await response.json();
-            console.log(data);
-        } catch (error) {
-            alert(error.message);
+        // hit the login API with the data
+        const response = await fetch("http://localhost:4000/auth/login", {
+            body: JSON.stringify(body),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        // get the data if fetching succeed!
+        const result = await response.json();
+        if (result.success) {
+            // save token to local storage
+            localStorage.setItem("token", result.data.token);
+            return;
         }
+
+        alert(result.message);
     };
 
     return (
