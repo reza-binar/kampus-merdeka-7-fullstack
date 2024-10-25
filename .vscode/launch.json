@@ -30,6 +30,13 @@
             "cwd": "${workspaceFolder}/chapter-5/express-js",
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run", "dev"] // Corrected this line
+        },
+        {
+            "name": "Chapter 6 - React.js",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/chapter-6/student-app"
         }
     ]
 }
