@@ -1,5 +1,5 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
@@ -16,6 +16,14 @@ function Register() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
+
+    useEffect(() => {
+        // get token from local storage
+        const token = localStorage.getItem("token");
+        if (token) {
+            window.location = "/";
+        }
+    }, []);
 
     const onSubmit = async (event) => {
         event.preventDefault();

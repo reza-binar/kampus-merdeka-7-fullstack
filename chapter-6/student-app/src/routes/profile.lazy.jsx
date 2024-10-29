@@ -14,8 +14,9 @@ function Profile() {
     useEffect(() => {
         // get token from local storage
         const token = localStorage.getItem("token");
-
-        if (token) {
+        if (!token) {
+            window.location = "/login";
+        } else {
             // hit api auth get profile and pass the token to the function
             getProfile(token);
         }
