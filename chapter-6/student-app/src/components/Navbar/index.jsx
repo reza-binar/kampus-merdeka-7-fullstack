@@ -46,6 +46,9 @@ const NavigationBar = () => {
 
         // delete the local storage here
         localStorage.removeItem("token");
+
+        // redirect to login
+        window.location = "/login";
     };
 
     return (

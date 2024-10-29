@@ -41,6 +41,10 @@ function Login() {
         if (result.success) {
             // save token to local storage
             localStorage.setItem("token", result.data.token);
+
+            // redirect to home
+            window.location = "/";
+
             return;
         }
 
