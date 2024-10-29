@@ -30,10 +30,13 @@ function Register() {
         formData.append("password", password);
         formData.append("profile_picture", profilePicture);
 
-        const response = await fetch("http://localhost:4000/auth/register", {
-            method: "POST",
-            body: formData,
-        });
+        const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/auth/register`,
+            {
+                method: "POST",
+                body: formData,
+            }
+        );
 
         // get the data if fetching succeed!
         const result = await response.json();

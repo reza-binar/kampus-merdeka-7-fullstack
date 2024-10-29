@@ -25,13 +25,16 @@ function Login() {
         };
 
         // hit the login API with the data
-        const response = await fetch("http://localhost:4000/auth/login", {
-            body: JSON.stringify(body),
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/auth/login`,
+            {
+                body: JSON.stringify(body),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
         // get the data if fetching succeed!
         const result = await response.json();
