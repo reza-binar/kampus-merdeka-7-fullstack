@@ -1,16 +1,21 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
+import { useDispatch } from "react-redux";
+import { setToken } from "../redux/slices/auth";
 
 export const Route = createLazyFileRoute("/login")({
     component: Login,
 });
 
 function Login() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -47,12 +52,11 @@ function Login() {
         // get the data if fetching succeed!
         const result = await response.json();
         if (result.success) {
-            // save token to local storage
-            localStorage.setItem("token", result.data.token);
+            // set token to global state
+            dispatch(setToken(result.data.token));
 
             // redirect to home
-            window.location = "/";
-
+            navigate({ to: "/" });
             return;
         }
 

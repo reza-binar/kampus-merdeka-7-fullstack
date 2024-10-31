@@ -1,59 +1,63 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import Image from "react-bootstrap/Image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setToken, setUser } from "../../redux/slices/auth";
 
 const NavigationBar = () => {
-    const [user, setUser] = useState(null);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { user, token } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        // get token from local storage
-        const token = localStorage.getItem("token");
+        const getProfile = async (token) => {
+            // fetch get profile
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/auth/profile`,
+                {
+                    headers: {
+                        authorization: `Bearer ${token}`,
+                    },
+                    method: "GET",
+                }
+            );
+
+            // get data
+            const result = await response.json();
+            if (result.success) {
+                // set the user state here
+                dispatch(setUser(result.data));
+                return;
+            }
+
+            // If not success
+            // delete the local storage here
+            dispatch(setUser(null));
+            dispatch(setToken(null));
+
+            // redirect to login
+            navigate({ to: "/login" });
+        };
 
         if (token) {
             // hit api auth get profile and pass the token to the function
             getProfile(token);
         }
-    }, []);
-
-    const getProfile = async (token) => {
-        // fetch get profile
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/auth/profile`,
-            {
-                headers: {
-                    authorization: `Bearer ${token}`,
-                },
-                method: "GET",
-            }
-        );
-
-        // get data
-        const result = await response.json();
-        if (result.success) {
-            // set the user state here
-            setUser(result.data);
-            return;
-        }
-
-        // If not success
-        // delete the local storage here
-        localStorage.removeItem("token");
-
-        // redirect to login
-        window.location = "/login";
-    };
+    }, [dispatch, navigate, token]);
 
     const logout = (event) => {
         event.preventDefault();
 
         // delete the local storage here
-        localStorage.removeItem("token");
+        dispatch(setUser(null));
+        dispatch(setToken(null));
 
         // redirect to login
-        window.location = "/login";
+        navigate({ to: "/login" });
     };
 
     return (
