@@ -23,9 +23,9 @@ function Login() {
         // get token from local storage
         const token = localStorage.getItem("token");
         if (token) {
-            window.location = "/";
+            navigate({ to: "/" });
         }
-    }, []);
+    }, [navigate]);
 
     const onSubmit = async (event) => {
         event.preventDefault();
