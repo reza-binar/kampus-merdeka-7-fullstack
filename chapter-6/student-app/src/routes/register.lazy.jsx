@@ -1,16 +1,22 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
+import { useSelector } from "react-redux";
+import { register } from "../service/auth";
 
 export const Route = createLazyFileRoute("/register")({
     component: Register,
 });
 
 function Register() {
+    const navigate = useNavigate();
+
+    const { token } = useSelector((state) => state.auth);
+
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -19,11 +25,10 @@ function Register() {
 
     useEffect(() => {
         // get token from local storage
-        const token = localStorage.getItem("token");
         if (token) {
-            window.location = "/";
+            navigate({ to: "/" });
         }
-    }, []);
+    }, [token, navigate]);
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -32,22 +37,14 @@ function Register() {
             alert("Password and password confirmation must be same!");
         }
 
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("profile_picture", profilePicture);
-
-        const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/auth/register`,
-            {
-                method: "POST",
-                body: formData,
-            }
-        );
-
-        // get the data if fetching succeed!
-        const result = await response.json();
+        // hit API here
+        const request = {
+            name,
+            email,
+            password,
+            profilePicture,
+        };
+        const result = await register(request);
         if (result.success) {
             // save token to local storage
             localStorage.setItem("token", result.data.token);
