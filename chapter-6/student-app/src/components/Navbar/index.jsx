@@ -15,9 +15,9 @@ const NavigationBar = () => {
     const { user, token } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        const getProfile = async (token) => {
+        const getProfile = async () => {
             // fetch get profile
-            const result = await profile(token);
+            const result = await profile();
             if (result.success) {
                 // set the user state here
                 dispatch(setUser(result.data));
@@ -35,7 +35,7 @@ const NavigationBar = () => {
 
         if (token) {
             // hit api auth get profile and pass the token to the function
-            getProfile(token);
+            getProfile();
         }
     }, [dispatch, navigate, token]);
 

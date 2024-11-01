@@ -32,7 +32,8 @@ export const register = async (request) => {
     return result;
 };
 
-export const profile = async (token) => {
+export const profile = async () => {
+    const token = localStorage.getItem("token");
     const response = await fetch(
         `${import.meta.env.VITE_API_URL}/auth/profile`,
         {
