@@ -33,7 +33,9 @@ function Index() {
         <Row className="mt-4">
             {!token && (
                 <Col>
-                    <h1>Please login first to get student data!</h1>
+                    <h1 className="text-center">
+                        Please login first to get student data!
+                    </h1>
                 </Col>
             )}
 
