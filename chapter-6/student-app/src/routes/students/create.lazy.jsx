@@ -102,6 +102,9 @@ function CreateStudent() {
                                 </Form.Label>
                                 <Col sm="9">
                                     <Form.Select aria-label="Default select example">
+                                        <option disabled selected>
+                                            Select University
+                                        </option>
                                         {universities.length > 0 &&
                                             universities.map((university) => (
                                                 <option
@@ -124,6 +127,9 @@ function CreateStudent() {
                                 </Form.Label>
                                 <Col sm="9">
                                     <Form.Select aria-label="Default select example">
+                                        <option disabled selected>
+                                            Select Class
+                                        </option>
                                         {classes.length > 0 &&
                                             classes.map((c) => (
                                                 <option
