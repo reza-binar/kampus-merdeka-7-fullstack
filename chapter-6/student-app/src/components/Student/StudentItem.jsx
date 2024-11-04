@@ -2,6 +2,7 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import PropTypes from "prop-types";
+import { Link } from "@tanstack/react-router";
 
 const StudentItem = ({ student }) => {
     return (
@@ -11,7 +12,13 @@ const StudentItem = ({ student }) => {
                 <Card.Body>
                     <Card.Title>{student?.name}</Card.Title>
                     <Card.Text>{student?.nick_name}</Card.Text>
-                    <Button variant="primary">Detail Student</Button>
+                    <Button
+                        as={Link}
+                        href={`/students/${student?.id}`}
+                        variant="primary"
+                    >
+                        Detail Student
+                    </Button>
                 </Card.Body>
             </Card>
         </Col>

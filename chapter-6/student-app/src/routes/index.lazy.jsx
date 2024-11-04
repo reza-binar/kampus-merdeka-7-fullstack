@@ -31,19 +31,29 @@ function Index() {
         }
     }, [token]);
 
-    return (
-        <Row className="mt-4">
-            {!token && (
+    if (!token) {
+        return (
+            <Row className="mt-4">
                 <Col>
                     <h1 className="text-center">
                         Please login first to get student data!
                     </h1>
                 </Col>
-            )}
+            </Row>
+        );
+    }
 
-            {isLoading ? (
+    if (isLoading) {
+        return (
+            <Row className="mt-4">
                 <h1>Loading...</h1>
-            ) : students.length === 0 ? (
+            </Row>
+        );
+    }
+
+    return (
+        <Row className="mt-4">
+            {students.length === 0 ? (
                 <h1>Student data is not found!</h1>
             ) : (
                 students.map((student) => (
