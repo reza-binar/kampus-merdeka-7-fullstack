@@ -9,6 +9,7 @@ import Image from "react-bootstrap/Image";
 import { getUniversities } from "../../service/university";
 import { getClasses } from "../../service/class";
 import { createStudent } from "../../service/student";
+import { toast } from "react-toastify";
 
 export const Route = createLazyFileRoute("/students/create")({
     component: CreateStudent,
@@ -61,7 +62,7 @@ function CreateStudent() {
             return;
         }
 
-        alert(result?.message);
+        toast.error(result?.message);
     };
 
     return (

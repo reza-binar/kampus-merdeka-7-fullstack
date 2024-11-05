@@ -5,6 +5,8 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { deleteStudent, getDetailStudent } from "../../service/student";
+import { toast } from "react-toastify";
+import { confirmAlert } from "react-confirm-alert";
 
 export const Route = createLazyFileRoute("/students/$id")({
     component: StudentDetail,
@@ -59,15 +61,28 @@ function StudentDetail() {
     const onDelete = async (event) => {
         event.preventDefault();
 
-        if (confirm("Are you sure to delete this data?")) {
-            const result = await deleteStudent(id);
-            if (result?.success) {
-                navigate({ to: "/" });
-                return;
-            }
+        confirmAlert({
+            title: "Confirm to delete",
+            message: "Are you sure to delete this data?",
+            buttons: [
+                {
+                    label: "Yes",
+                    onClick: async () => {
+                        const result = await deleteStudent(id);
+                        if (result?.success) {
+                            navigate({ to: "/" });
+                            return;
+                        }
 
-            alert(result?.message);
-        }
+                        toast.error(result?.message);
+                    },
+                },
+                {
+                    label: "No",
+                    onClick: () => {},
+                },
+            ],
+        });
     };
 
     return (

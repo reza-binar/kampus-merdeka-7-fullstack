@@ -9,6 +9,7 @@ import Image from "react-bootstrap/Image";
 import { getUniversities } from "../../../service/university";
 import { getClasses } from "../../../service/class";
 import { getDetailStudent, updateStudent } from "../../../service/student";
+import { toast } from "react-toastify";
 
 export const Route = createLazyFileRoute("/students/edit/$id")({
     component: EditStudent,
@@ -90,7 +91,7 @@ function EditStudent() {
             return;
         }
 
-        alert(result?.message);
+        toast.error(result?.message);
     };
 
     return (
