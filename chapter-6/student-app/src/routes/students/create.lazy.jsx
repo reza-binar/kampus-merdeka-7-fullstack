@@ -5,6 +5,7 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Image from "react-bootstrap/Image";
 import { getUniversities } from "../../service/university";
 import { getClasses } from "../../service/class";
 
@@ -16,6 +17,8 @@ function CreateStudent() {
     const [name, setName] = useState("");
     const [nickName, setNickName] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
+    const [currentProfilePicture, setCurrentProfilePicture] =
+        useState(undefined);
     const [universities, setUniversities] = useState([]);
     const [universityId, setUniversityId] = useState(0);
     const [classes, setClasses] = useState([]);
@@ -159,9 +162,24 @@ function CreateStudent() {
                                             setProfilePicture(
                                                 event.target.files[0]
                                             );
+                                            setCurrentProfilePicture(
+                                                URL.createObjectURL(
+                                                    event.target.files[0]
+                                                )
+                                            );
                                         }}
                                         accept=".jpg,.png"
                                     />
+                                </Col>
+                            </Form.Group>
+                            <Form.Group
+                                as={Row}
+                                className="mb-3"
+                                controlId="profilePicture"
+                            >
+                                <Form.Label column sm={3}></Form.Label>
+                                <Col sm={9}>
+                                    <Image src={currentProfilePicture} fluid />
                                 </Col>
                             </Form.Group>
                             <div className="d-grid gap-2">
