@@ -36,3 +36,28 @@ export const getDetailStudent = async (id) => {
     const result = await response.json();
     return result;
 };
+
+export const createStudent = async (request) => {
+    const token = localStorage.getItem("token");
+
+    const formData = new FormData();
+    formData.append("name", request.name);
+    formData.append("nick_name", request.nickName);
+    formData.append("class_id", request.classId);
+    formData.append("university_id", request.universityId);
+    if (request.profilePicture) {
+        formData.append("profile_picture", request.profilePicture);
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/students`, {
+        headers: {
+            authorization: `Bearer ${token}`,
+        },
+        method: "POST",
+        body: formData,
+    });
+
+    // get the data if fetching succeed!
+    const result = await response.json();
+    return result;
+};
