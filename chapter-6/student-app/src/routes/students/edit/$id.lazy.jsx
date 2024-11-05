@@ -8,7 +8,7 @@ import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
 import { getUniversities } from "../../../service/university";
 import { getClasses } from "../../../service/class";
-import { getDetailStudent } from "../../../service/student";
+import { getDetailStudent, updateStudent } from "../../../service/student";
 
 export const Route = createLazyFileRoute("/students/edit/$id")({
     component: EditStudent,
@@ -54,8 +54,8 @@ function EditStudent() {
             if (result?.success) {
                 setName(result.data?.name);
                 setNickName(result.data?.nick_name);
-                setUniversityId(result.data?.universityId);
-                setClassId(result.data?.classId);
+                setUniversityId(result.data?.university_id);
+                setClassId(result.data?.class_id);
                 setCurrentProfilePicture(result.data?.profile_picture);
                 setIsNotFound(false);
             } else {
@@ -74,8 +74,23 @@ function EditStudent() {
         return;
     }
 
-    const onSubmit = (event) => {
+    const onSubmit = async (event) => {
         event.preventDefault();
+
+        const request = {
+            name,
+            nickName,
+            classId,
+            universityId,
+            profilePicture,
+        };
+        const result = await updateStudent(id, request);
+        if (result?.success) {
+            navigate({ to: `/students/${id}` });
+            return;
+        }
+
+        alert(result?.message);
     };
 
     return (
@@ -136,7 +151,12 @@ function EditStudent() {
                                     University
                                 </Form.Label>
                                 <Col sm="9">
-                                    <Form.Select aria-label="Default select example">
+                                    <Form.Select
+                                        aria-label="Default select example"
+                                        onChange={(event) =>
+                                            setUniversityId(event.target.value)
+                                        }
+                                    >
                                         <option disabled>
                                             Select University
                                         </option>
@@ -166,7 +186,12 @@ function EditStudent() {
                                     Class
                                 </Form.Label>
                                 <Col sm="9">
-                                    <Form.Select aria-label="Default select example">
+                                    <Form.Select
+                                        aria-label="Default select example"
+                                        onChange={(event) =>
+                                            setClassId(event.target.value)
+                                        }
+                                    >
                                         <option disabled>Select Class</option>
                                         {!isLoading &&
                                             classes.length > 0 &&
