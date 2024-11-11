@@ -8,6 +8,7 @@ import { deleteStudent, getDetailStudent } from "../../service/student";
 import { toast } from "react-toastify";
 import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createLazyFileRoute("/students/$id")({
     component: StudentDetail,
@@ -20,28 +21,23 @@ function StudentDetail() {
     const { user } = useSelector((state) => state.auth);
 
     const [student, setStudent] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
     const [isNotFound, setIsNotFound] = useState(false);
 
+    // Use react query to fetch API
+    const { data, isSuccess, isPending } = useQuery({
+        queryKey: ["students", id],
+        queryFn: () => getDetailStudent(id),
+        enabled: !!id,
+    });
+
     useEffect(() => {
-        const getDetailStudentData = async (id) => {
-            setIsLoading(true);
-            const result = await getDetailStudent(id);
-            if (result?.success) {
-                setStudent(result.data);
-                setIsNotFound(false);
-            } else {
-                setIsNotFound(true);
-            }
-            setIsLoading(false);
-        };
-
-        if (id) {
-            getDetailStudentData(id);
+        if (isSuccess) {
+            setStudent(data?.data);
+            setIsNotFound(false);
         }
-    }, [id]);
+    }, [data, isSuccess]);
 
-    if (isLoading) {
+    if (isPending) {
         return (
             <Row className="mt-5">
                 <Col>

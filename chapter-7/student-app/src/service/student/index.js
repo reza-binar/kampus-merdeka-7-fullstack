@@ -1,6 +1,6 @@
 export const getStudents = async (nickName) => {
     const token = localStorage.getItem("token");
-    let params;
+    let params = {};
     if (nickName) {
         params.nick_name = nickName;
     }

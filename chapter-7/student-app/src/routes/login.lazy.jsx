@@ -1,5 +1,5 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setToken } from "../redux/slices/auth";
 import { login } from "../service/auth";
 import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
 
 export const Route = createLazyFileRoute("/login")({
     component: Login,
@@ -23,12 +24,27 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    useEffect(() => {
-        // get token from local storage
-        if (token) {
-            navigate({ to: "/" });
-        }
-    }, [navigate, token]);
+    if (token) {
+        navigate({ to: "/" });
+    }
+
+    // Mutation is used for POST, PUT, PATCH and DELETE
+    const { mutate: loginUser } = useMutation({
+        mutationFn: (body) => {
+            return login(body);
+        },
+        onSettled: (data) => {
+            if (data?.success) {
+                // set token to global state
+                dispatch(setToken(data?.data?.token));
+
+                // redirect to home
+                navigate({ to: "/" });
+            } else {
+                toast.error(data?.message);
+            }
+        },
+    });
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -41,17 +57,7 @@ function Login() {
         };
 
         // hit the login API with the data
-        const result = await login(body);
-        if (result.success) {
-            // set token to global state
-            dispatch(setToken(result.data.token));
-
-            // redirect to home
-            navigate({ to: "/" });
-            return;
-        }
-
-        toast.error(result?.message);
+        loginUser(body);
     };
 
     return (

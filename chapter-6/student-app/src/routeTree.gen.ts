@@ -21,7 +21,6 @@ const ProfileLazyImport = createFileRoute('/profile')()
 const LoginLazyImport = createFileRoute('/login')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
-const StudentsIndexLazyImport = createFileRoute('/students/')()
 const StudentsCreateLazyImport = createFileRoute('/students/create')()
 const StudentsIdLazyImport = createFileRoute('/students/$id')()
 const StudentsEditIdLazyImport = createFileRoute('/students/edit/$id')()
@@ -57,14 +56,6 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-
-const StudentsIndexLazyRoute = StudentsIndexLazyImport.update({
-  id: '/students/',
-  path: '/students/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() =>
-  import('./routes/students/index.lazy').then((d) => d.Route),
-)
 
 const StudentsCreateLazyRoute = StudentsCreateLazyImport.update({
   id: '/students/create',
@@ -141,13 +132,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentsCreateLazyImport
       parentRoute: typeof rootRoute
     }
-    '/students/': {
-      id: '/students/'
-      path: '/students'
-      fullPath: '/students'
-      preLoaderRoute: typeof StudentsIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
     '/students/edit/$id': {
       id: '/students/edit/$id'
       path: '/students/edit/$id'
@@ -168,7 +152,6 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterLazyRoute
   '/students/$id': typeof StudentsIdLazyRoute
   '/students/create': typeof StudentsCreateLazyRoute
-  '/students': typeof StudentsIndexLazyRoute
   '/students/edit/$id': typeof StudentsEditIdLazyRoute
 }
 
@@ -180,7 +163,6 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterLazyRoute
   '/students/$id': typeof StudentsIdLazyRoute
   '/students/create': typeof StudentsCreateLazyRoute
-  '/students': typeof StudentsIndexLazyRoute
   '/students/edit/$id': typeof StudentsEditIdLazyRoute
 }
 
@@ -193,7 +175,6 @@ export interface FileRoutesById {
   '/register': typeof RegisterLazyRoute
   '/students/$id': typeof StudentsIdLazyRoute
   '/students/create': typeof StudentsCreateLazyRoute
-  '/students/': typeof StudentsIndexLazyRoute
   '/students/edit/$id': typeof StudentsEditIdLazyRoute
 }
 
@@ -207,7 +188,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/students/$id'
     | '/students/create'
-    | '/students'
     | '/students/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -218,7 +198,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/students/$id'
     | '/students/create'
-    | '/students'
     | '/students/edit/$id'
   id:
     | '__root__'
@@ -229,7 +208,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/students/$id'
     | '/students/create'
-    | '/students/'
     | '/students/edit/$id'
   fileRoutesById: FileRoutesById
 }
@@ -242,7 +220,6 @@ export interface RootRouteChildren {
   RegisterLazyRoute: typeof RegisterLazyRoute
   StudentsIdLazyRoute: typeof StudentsIdLazyRoute
   StudentsCreateLazyRoute: typeof StudentsCreateLazyRoute
-  StudentsIndexLazyRoute: typeof StudentsIndexLazyRoute
   StudentsEditIdLazyRoute: typeof StudentsEditIdLazyRoute
 }
 
@@ -254,7 +231,6 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterLazyRoute: RegisterLazyRoute,
   StudentsIdLazyRoute: StudentsIdLazyRoute,
   StudentsCreateLazyRoute: StudentsCreateLazyRoute,
-  StudentsIndexLazyRoute: StudentsIndexLazyRoute,
   StudentsEditIdLazyRoute: StudentsEditIdLazyRoute,
 }
 
@@ -277,7 +253,6 @@ export const routeTree = rootRoute
         "/register",
         "/students/$id",
         "/students/create",
-        "/students/",
         "/students/edit/$id"
       ]
     },
@@ -301,9 +276,6 @@ export const routeTree = rootRoute
     },
     "/students/create": {
       "filePath": "students/create.lazy.jsx"
-    },
-    "/students/": {
-      "filePath": "students/index.lazy.jsx"
     },
     "/students/edit/$id": {
       "filePath": "students/edit/$id.lazy.jsx"

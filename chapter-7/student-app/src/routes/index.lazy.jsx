@@ -5,6 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { getStudents } from "../service/student";
 import StudentItem from "../components/Student/StudentItem";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createLazyFileRoute("/")({
     component: Index,
@@ -14,22 +15,19 @@ function Index() {
     const { token } = useSelector((state) => state.auth);
 
     const [students, setStudents] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+
+    // Use react query to fetch API
+    const { data, isSuccess, isPending } = useQuery({
+        queryKey: ["students"],
+        queryFn: () => getStudents(),
+        enabled: !!token,
+    });
 
     useEffect(() => {
-        const getStudentData = async () => {
-            setIsLoading(true);
-            const result = await getStudents();
-            if (result.success) {
-                setStudents(result.data);
-            }
-            setIsLoading(false);
-        };
-
-        if (token) {
-            getStudentData();
+        if (isSuccess) {
+            setStudents(data?.data);
         }
-    }, [token]);
+    }, [data, isSuccess]);
 
     if (!token) {
         return (
@@ -43,7 +41,7 @@ function Index() {
         );
     }
 
-    if (isLoading) {
+    if (isPending) {
         return (
             <Row className="mt-4">
                 <h1>Loading...</h1>
