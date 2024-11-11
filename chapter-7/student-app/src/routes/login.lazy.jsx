@@ -33,16 +33,15 @@ function Login() {
         mutationFn: (body) => {
             return login(body);
         },
-        onSettled: (data) => {
-            if (data?.success) {
-                // set token to global state
-                dispatch(setToken(data?.data?.token));
+        onSuccess: (data) => {
+            // set token to global state
+            dispatch(setToken(data?.token));
 
-                // redirect to home
-                navigate({ to: "/" });
-            } else {
-                toast.error(data?.message);
-            }
+            // redirect to home
+            navigate({ to: "/" });
+        },
+        onError: (err) => {
+            toast.error(err?.message);
         },
     });
 

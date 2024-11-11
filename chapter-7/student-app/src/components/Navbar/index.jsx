@@ -33,7 +33,7 @@ const NavigationBar = () => {
 
     useEffect(() => {
         if (isSuccess) {
-            dispatch(setUser(data?.data));
+            dispatch(setUser(data));
         } else if (isError) {
             handleLogout();
         }

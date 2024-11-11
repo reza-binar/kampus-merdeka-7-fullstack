@@ -9,7 +9,11 @@ export const login = async (request) => {
 
     // get the data if fetching succeed!
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
 export const register = async (request) => {
@@ -29,7 +33,11 @@ export const register = async (request) => {
 
     // get the data if fetching succeed!
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
 export const profile = async () => {
@@ -46,5 +54,9 @@ export const profile = async () => {
 
     // get data
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };

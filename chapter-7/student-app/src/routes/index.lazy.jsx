@@ -25,7 +25,7 @@ function Index() {
 
     useEffect(() => {
         if (isSuccess) {
-            setStudents(data?.data);
+            setStudents(data);
         }
     }, [data, isSuccess]);
 

@@ -32,7 +32,7 @@ function StudentDetail() {
 
     useEffect(() => {
         if (isSuccess) {
-            setStudent(data?.data);
+            setStudent(data);
             setIsNotFound(false);
         }
     }, [data, isSuccess]);
