@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -8,9 +8,9 @@ import { deleteStudent, getDetailStudent } from "../../service/student";
 import { toast } from "react-toastify";
 import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const Route = createLazyFileRoute("/students/$id")({
+export const Route = createFileRoute("/students/$id")({
     component: StudentDetail,
 });
 
@@ -21,19 +21,27 @@ function StudentDetail() {
     const { user } = useSelector((state) => state.auth);
 
     const [student, setStudent] = useState(null);
-    const [isNotFound, setIsNotFound] = useState(false);
 
     // Use react query to fetch API
-    const { data, isSuccess, isPending } = useQuery({
+    const { data, isSuccess, isPending, isError } = useQuery({
         queryKey: ["students", id],
         queryFn: () => getDetailStudent(id),
         enabled: !!id,
     });
 
+    const { mutate: deleting, isPending: isDeleteProcessing } = useMutation({
+        mutationFn: () => deleteStudent(id),
+        onSuccess: () => {
+            navigate({ to: "/" });
+        },
+        onError: (error) => {
+            toast.error(error?.message);
+        },
+    });
+
     useEffect(() => {
         if (isSuccess) {
             setStudent(data);
-            setIsNotFound(false);
         }
     }, [data, isSuccess]);
 
@@ -47,7 +55,7 @@ function StudentDetail() {
         );
     }
 
-    if (isNotFound) {
+    if (isError) {
         return (
             <Row className="mt-5">
                 <Col>
@@ -67,13 +75,7 @@ function StudentDetail() {
                 {
                     label: "Yes",
                     onClick: async () => {
-                        const result = await deleteStudent(id);
-                        if (result?.success) {
-                            navigate({ to: "/" });
-                            return;
-                        }
-
-                        toast.error(result?.message);
+                        deleting();
                     },
                 },
                 {
@@ -104,6 +106,7 @@ function StudentDetail() {
                                             href={`/students/edit/${id}`}
                                             variant="primary"
                                             size="md"
+                                            disabled={isDeleteProcessing}
                                         >
                                             Edit Student
                                         </Button>
@@ -113,6 +116,7 @@ function StudentDetail() {
                                     <div className="d-grid gap-2">
                                         <Button
                                             onClick={onDelete}
+                                            disabled={isDeleteProcessing}
                                             variant="danger"
                                             size="md"
                                         >

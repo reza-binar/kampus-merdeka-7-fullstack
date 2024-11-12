@@ -1,55 +1,84 @@
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
-import { getUniversities } from "../../service/university";
-import { getClasses } from "../../service/class";
-import { createStudent } from "../../service/student";
+import { getUniversities } from "../../../service/university";
+import { getClasses } from "../../../service/class";
+import { getDetailStudent, updateStudent } from "../../../service/student";
 import { toast } from "react-toastify";
-import Protected from "../../components/Auth/Protected";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import Protected from "../../../components/Auth/Protected";
 
-export const Route = createLazyFileRoute("/students/create")({
+export const Route = createFileRoute("/students/edit/$id")({
     component: () => (
         <Protected roles={[1]}>
-            <CreateStudent />
+            <EditStudent />
         </Protected>
     ),
 });
 
-function CreateStudent() {
+function EditStudent() {
+    const { id } = Route.useParams();
     const navigate = useNavigate();
 
     const [name, setName] = useState("");
     const [nickName, setNickName] = useState("");
+    const [currentProfilePicture, setCurrentProfilePicture] = useState("");
     const [profilePicture, setProfilePicture] = useState(undefined);
-    const [currentProfilePicture, setCurrentProfilePicture] =
-        useState(undefined);
-    const [universities, setUniversities] = useState([]);
     const [universityId, setUniversityId] = useState(0);
-    const [classes, setClasses] = useState([]);
     const [classId, setClassId] = useState(0);
 
-    useEffect(() => {
-        const getUniversitiesData = async () => {
-            const result = await getUniversities();
-            if (result?.success) {
-                setUniversities(result?.data);
-            }
-        };
-        const getClassesData = async () => {
-            const result = await getClasses();
-            if (result?.success) {
-                setClasses(result?.data);
-            }
-        };
+    const { data: universities } = useQuery({
+        queryKey: ["universities"],
+        queryFn: getUniversities,
+        enabled: !!id,
+    });
 
-        getUniversitiesData();
-        getClassesData();
-    }, []);
+    const { data: classes } = useQuery({
+        queryKey: ["classes"],
+        queryFn: getClasses,
+        enabled: !!id,
+    });
+
+    const {
+        data: student,
+        isSuccess,
+        isPending,
+        isError,
+    } = useQuery({
+        queryKey: ["student", id],
+        queryFn: () => getDetailStudent(id),
+        enabled: !!id,
+    });
+
+    const { mutate: update, isPending: isUpdateProcessing } = useMutation({
+        mutationFn: (request) => updateStudent(id, request),
+        onSuccess: () => {
+            navigate({ to: `/students/${id}` });
+        },
+        onError: (error) => {
+            toast.error(error?.message);
+        },
+    });
+
+    useEffect(() => {
+        if (isSuccess) {
+            setName(student?.name);
+            setNickName(student?.nick_name);
+            setUniversityId(student?.university_id);
+            setClassId(student?.class_id);
+            setCurrentProfilePicture(student?.profile_picture);
+        }
+    }, [isSuccess, student]);
+
+    if (isError) {
+        navigate({ to: "/" });
+        return;
+    }
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -61,13 +90,7 @@ function CreateStudent() {
             universityId,
             profilePicture,
         };
-        const result = await createStudent(request);
-        if (result?.success) {
-            navigate({ to: "/" });
-            return;
-        }
-
-        toast.error(result?.message);
+        update(request);
     };
 
     return (
@@ -75,7 +98,7 @@ function CreateStudent() {
             <Col className="offset-md-3">
                 <Card>
                     <Card.Header className="text-center">
-                        Create Student
+                        Edit Student
                     </Card.Header>
                     <Card.Body>
                         <Form onSubmit={onSubmit}>
@@ -134,16 +157,22 @@ function CreateStudent() {
                                             setUniversityId(event.target.value)
                                         }
                                     >
-                                        <option disabled selected>
+                                        <option disabled>
                                             Select University
                                         </option>
-                                        {universities.length > 0 &&
-                                            universities.map((university) => (
+                                        {!isPending &&
+                                            universities &&
+                                            universities?.length > 0 &&
+                                            universities?.map((university) => (
                                                 <option
-                                                    key={university?.id}
-                                                    value={university?.id}
+                                                    key={university.id}
+                                                    value={university.id}
+                                                    selected={
+                                                        university.id ==
+                                                        universityId
+                                                    }
                                                 >
-                                                    {university?.name}
+                                                    {university.name}
                                                 </option>
                                             ))}
                                     </Form.Select>
@@ -164,16 +193,17 @@ function CreateStudent() {
                                             setClassId(event.target.value)
                                         }
                                     >
-                                        <option disabled selected>
-                                            Select Class
-                                        </option>
-                                        {classes.length > 0 &&
-                                            classes.map((c) => (
+                                        <option disabled>Select Class</option>
+                                        {!isPending &&
+                                            classes &&
+                                            classes?.length > 0 &&
+                                            classes?.map((c) => (
                                                 <option
-                                                    key={c?.id}
-                                                    value={c?.id}
+                                                    key={c.id}
+                                                    value={c.id}
+                                                    selected={c.id == classId}
                                                 >
-                                                    {c?.class}
+                                                    {c.class}
                                                 </option>
                                             ))}
                                     </Form.Select>
@@ -191,7 +221,6 @@ function CreateStudent() {
                                     <Form.Control
                                         type="file"
                                         placeholder="Choose File"
-                                        required
                                         onChange={(event) => {
                                             setProfilePicture(
                                                 event.target.files[0]
@@ -217,8 +246,12 @@ function CreateStudent() {
                                 </Col>
                             </Form.Group>
                             <div className="d-grid gap-2">
-                                <Button type="submit" variant="primary">
-                                    Create Student
+                                <Button
+                                    type="submit"
+                                    disabled={isUpdateProcessing}
+                                    variant="primary"
+                                >
+                                    Edit Student
                                 </Button>
                             </div>
                         </Form>

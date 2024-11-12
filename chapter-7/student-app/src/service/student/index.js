@@ -67,7 +67,11 @@ export const createStudent = async (request) => {
 
     // get the data if fetching succeed!
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
 export const updateStudent = async (id, request) => {
@@ -95,7 +99,11 @@ export const updateStudent = async (id, request) => {
 
     // get the data if fetching succeed!
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
 
 export const deleteStudent = async (id) => {
@@ -112,5 +120,9 @@ export const deleteStudent = async (id) => {
 
     // get data
     const result = await response.json();
-    return result;
+    if (!result?.success) {
+        throw new Error(result?.message);
+    }
+
+    return result?.data;
 };
