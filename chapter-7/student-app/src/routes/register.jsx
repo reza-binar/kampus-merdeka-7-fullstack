@@ -6,7 +6,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { useDispatch, useSelector } from "react-redux";
-import { register } from "../service/auth";
+import { google, register } from "../service/auth";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -50,6 +50,22 @@ function Register() {
         },
     });
 
+    const { mutate: registerWithGoogle } = useMutation({
+        mutationFn: (accessToken) => {
+            return google(accessToken);
+        },
+        onSuccess: (data) => {
+            // set token to global state
+            dispatch(setToken(data?.token));
+
+            // redirect to home
+            navigate({ to: "/" });
+        },
+        onError: (err) => {
+            toast.error(err?.message);
+        },
+    });
+
     const onSubmit = async (event) => {
         event.preventDefault();
 
@@ -68,7 +84,9 @@ function Register() {
     };
 
     const googleLogin = useGoogleLogin({
-        onSuccess: (tokenResponse) => console.log(tokenResponse),
+        onSuccess: (tokenResponse) => {
+            registerWithGoogle(tokenResponse.access_token);
+        },
         onError: (err) => console.log(err),
     });
 
